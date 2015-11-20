@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">CineMania</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="insertAction">Insert</string>
+    <string name="modifyAction">Modify</string>
+    <string name="deleteAction">Delete</string>
+
+    <string name="item_list_textViewTitle">Delete</string>
+    <string name="item_list_textViewSubTitle">Delete</string>
+    <string name="title_activity_insert">InsertActivity</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
