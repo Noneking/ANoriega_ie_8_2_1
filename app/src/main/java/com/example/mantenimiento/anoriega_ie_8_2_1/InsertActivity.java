@@ -1,9 +1,11 @@
 package com.example.mantenimiento.anoriega_ie_8_2_1;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class InsertActivity extends Activity {
 
@@ -34,4 +36,18 @@ public class InsertActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void insertDate(View v)
+    {
+
+    }
+
+    public void insert(View v)
+    {
+        Intent i=new Intent();
+        i.putExtra("VALUE", 1);
+        setResult(RESULT_OK);
+        finish();
+    }
+
 }

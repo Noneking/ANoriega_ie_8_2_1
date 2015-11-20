@@ -12,4 +12,10 @@
     <string name="title_activity_insert">InsertActivity</string>
     <string name="action_settings">Settings</string>
 
+    <string name="editTextInsertTitle"></string>
+    <string name="editTextInsertSubTitle"></string>
+    <string name="textViewInsertDate"></string>
+    <string name="buttonInsertDate">Fecha</string>
+    <string name="buttonInsert">INSERT</string>
+
 </resources>
