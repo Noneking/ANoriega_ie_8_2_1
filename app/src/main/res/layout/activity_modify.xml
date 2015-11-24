@@ -8,7 +8,7 @@
     tools:context="com.example.mantenimiento.anoriega_ie_8_2_1.InsertActivity">
 
     <LinearLayout
-        android:id="@+id/insertFirstMain_linearLayout"
+        android:id="@+id/modifyFirstMain_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content">
 
             <ImageButton
-                android:id="@+id/imageButtonInsert"
+                android:id="@+id/imageButtonModify"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:src="@android:drawable/ic_menu_always_landscape_portrait" />
@@ -30,32 +30,32 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/insert_editTextTitle"
+                android:id="@+id/modify_editTextTitle"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="25dp"
-                android:hint="@string/editTextInsertTitleTag"
-                android:text="@string/editTextInsertTitle" />
+                android:hint="@string/editTextModifyTitleTag"
+                android:text="@string/editTextModifyTitle" />
 
             <EditText
-                android:id="@+id/insert_editTextSubTitle"
+                android:id="@+id/modify_editTextSubTitle"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="25dp"
-                android:hint="@string/editTextInsertSubTitleTag"
-                android:text="@string/editTextInsertSubTitle" />
+                android:hint="@string/editTextModifySubTitleTag"
+                android:text="@string/editTextModifySubTitle" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/insertSecondMain_linearLayout"
+        android:id="@+id/modifySecondMain_linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/insertFirstMain_linearLayout"
+        android:layout_below="@+id/modifyFirstMain_linearLayout"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"
         android:orientation="vertical"
         android:background="@drawable/rounded_corner">
@@ -66,23 +66,23 @@
             android:paddingBottom="8dp">
 
             <Button
-                android:id="@+id/insert_buttonDate"
+                android:id="@+id/modify_buttonDate"
                 android:layout_width="125dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:gravity="center_vertical"
-                android:text="@string/buttonInsertDate"
+                android:text="@string/buttonModifyDate"
                 android:onClick="insertDate"/>
 
             <TextView
-                android:id="@+id/insert_textViewDate"
+                android:id="@+id/modify_textViewDate"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:inputType="date"
-                android:hint="@string/editTextInsertDateTag"
-                android:text="@string/textViewInsertDate" />
+                android:hint="@string/editTextModifyDateTag"
+                android:text="@string/textViewModifyDate" />
 
         </LinearLayout>
 
@@ -93,12 +93,12 @@
             android:paddingRight="8dp">
 
             <EditText
-                android:id="@+id/insert_editTextDescripcion"
+                android:id="@+id/modify_editTextDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textMultiLine"
                 android:scrollHorizontally="false"
-                android:hint="@string/editTextInsertDescripcionTag"
+                android:hint="@string/editTextModifyDescripcionTag"
                 android:gravity="top"
                 android:lines="10"/>
 
@@ -107,11 +107,11 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/insert_buttonInsert"
+        android:id="@+id/modify_buttonInsert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/insertSecondMain_linearLayout"
-        android:text="@string/buttonInsert"
-        android:onClick="insert"/>
+        android:layout_below="@+id/modifySecondMain_linearLayout"
+        android:text="@string/buttonModify"
+        android:onClick="modify"/>
 
 </RelativeLayout>

@@ -17,5 +17,19 @@
     <string name="textViewInsertDate"></string>
     <string name="buttonInsertDate">Fecha</string>
     <string name="buttonInsert">INSERT</string>
+    <string name="editTextInsertTitleTag">Título</string>
+    <string name="editTextInsertSubTitleTag">Subtítulo</string>
+    <string name="editTextInsertDateTag">Fecha</string>
+    <string name="editTextInsertDescripcionTag">Descripción</string>
+
+    <string name="editTextModifyTitle"></string>
+    <string name="editTextModifySubTitle"></string>
+    <string name="textViewModifyDate"></string>
+    <string name="buttonModifyDate">Fecha</string>
+    <string name="buttonModify">INSERT</string>
+    <string name="editTextModifyTitleTag">Título</string>
+    <string name="editTextModifySubTitleTag">Subtítulo</string>
+    <string name="editTextModifyDateTag">Fecha</string>
+    <string name="editTextModifyDescripcionTag">Descripción</string>
 
 </resources>
