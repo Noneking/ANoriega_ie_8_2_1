@@ -37,8 +37,8 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
 
         initComponents();
         initListeners();
-        //openDatabase();
-        //loadDatas();
+        openDatabase();
+        loadDatas();
     }
 
     @Override
@@ -75,7 +75,8 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
                 startActivityForResult(intent, finished);
                 break;
             case R.id.modifyAction:
-
+                intent = new Intent(this, ModifyActivity.class);
+                startActivityForResult(intent, finished);
                 break;
             case R.id.deleteAction:
 
@@ -88,11 +89,13 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     public void openDatabase()
     {
         sqlite=openOrCreateDatabase("CineMania", Context.MODE_PRIVATE, null);
+        sqlite.execSQL("DROP TABLE PELICULA");
         sqlite.execSQL("CREATE TABLE IF NOT EXISTS PELICULA(" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
-                "TITULO VARCHAR(30) NOT NULL," +
+                "IMG VARCHAR(100)," +
+                "TITULO VARCHAR(30)," +
                 "SUBTITULO VARCHAR(30)," +
-                "FECHA DATE" +
+                "FECHA VARCHAR(9)," +
                 "DESCRIPCION VARCHAR(100)" +
                 ");");
     }
@@ -107,9 +110,26 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
             {
                 peliculas.add(cursor.getString(1));
             }
-            listViewAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,peliculas);
-            listView.setAdapter(listViewAdapter);
+            //listViewAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_single_choice,peliculas);
+            //listViewAdapter=new MyAdapter(this, );
+            //listView.setAdapter(listViewAdapter);
         }
+    }
+
+    public void loadDatassssss()
+    {
+
+    }
+
+    public void insert(String img, String titulo, String subtitulo, String fecha, String descripcion)
+    {
+        System.out.println(img);
+        System.out.println(titulo);
+        System.out.println(subtitulo);
+        System.out.println(fecha);
+        System.out.println(descripcion);
+        sqlite.execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ("+img+","+titulo+","+subtitulo+","+fecha+","+descripcion+");");
+        loadDatas();
     }
 
     public void initComponents()
@@ -132,7 +152,8 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     {
         if (requestCode == VALUE) {
             if (resultCode == RESULT_OK) {
-                //loadDatas();
+                insert(intent.getStringExtra("IMG"), intent.getStringExtra("TITULO"), intent.getStringExtra("SUBTITULO"), intent.getStringExtra("DATE"), intent.getStringExtra("DESCRIPTION"));
+                loadDatas();
                 Toast.makeText(MainActivity.this, "INSERTED CORRECTLY", Toast.LENGTH_LONG).show();
             }
         }

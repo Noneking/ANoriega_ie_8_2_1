@@ -20,6 +20,7 @@
             android:name=".InsertActivity"
             android:label="@string/title_activity_insert" />
         <activity android:name=".ModifyActivity" />
+        <activity android:name=".ItemList"></activity>
     </application>
 
 </manifest>
