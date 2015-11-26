@@ -7,6 +7,10 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,6 +25,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -28,7 +34,11 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
 
     private static final int SELECT_PICTURE = 1;
 
+    SQLiteDatabase sqlite;
+    ArrayList<ItemList> arrayList;
+
     public String selectedImagePath;
+    Bitmap imageBitMap;
 
     ImageButton imageButton;
     EditText editTextTitulo;
@@ -75,6 +85,8 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
 
     public void initComponents()
     {
+        arrayList=FullList.getArrayList();
+
         imageButton= (ImageButton) findViewById(R.id.imageButtonInsert);
         editTextTitulo= (EditText) findViewById(R.id.insert_editTextTitle);
         editTextSubTitulo= (EditText) findViewById(R.id.insert_editTextSubTitle);
@@ -93,24 +105,23 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
     {
         if(checkDatas())
         {
-            System.out.println(selectedImagePath);
-            System.out.println(editTextTitulo.getText());
-            System.out.println(editTextSubTitulo.getText());
-            System.out.println(textViewDate.getText());
-            System.out.println(editTextDescripcion.getText());
-            System.out.println("TERMINA LOS SYSTEM DE INSERT");
-            Intent i = new Intent();
-            i.putExtra("IMG", selectedImagePath);
-            i.putExtra("TITULO", editTextTitulo.getText());
-            i.putExtra("SUBTITULO", editTextSubTitulo.getText());
-            i.putExtra("DATE", textViewDate.getText());
-            i.putExtra("DESCRIPTION", editTextDescripcion.getText());
+            this.arrayList=FullList.getArrayList();
+            arrayList.add(new ItemList(selectedImagePath, editTextTitulo.getText().toString(), editTextSubTitulo.getText().toString(), textViewDate.getText().toString(), editTextDescripcion.getText().toString()));
+            FullList.setArrayList(arrayList);
+
             setResult(RESULT_OK);
             finish();
+
+
+            System.out.println(imageButton.getResources().toString());
+
+
         }
         else
         {
             Toast.makeText(InsertActivity.this, "DATA ERRORS", Toast.LENGTH_LONG).show();
+            setResult(RESULT_CANCELED);
+            finish();
         }
     }
 
@@ -171,6 +182,9 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
                 //System.out.println("Path del uri: "+selectedImageUri.getPath());
                 selectedImagePath = selectedImageUri.getPath();
                 imageButton.setImageURI(selectedImageUri);
+
+                //Drawable drawable = imageButton.getBackground();
+                //imageBitMap = ((BitmapDrawable)drawable).getBitmap();
             }
         }
     }
@@ -197,4 +211,11 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
     public void onResultadoFecha(GregorianCalendar fecha) {
         textViewDate.setText(fecha.get(Calendar.DAY_OF_MONTH)+"/"+(fecha.get(Calendar.MONTH)+1)+"/"+fecha.get(Calendar.YEAR));
     }
+
+    public static byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
+    }
+
 }
