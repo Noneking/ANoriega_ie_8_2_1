@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -25,6 +26,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,7 +37,7 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
 
     private static final int SELECT_PICTURE = 1;
 
-    SQLiteDatabase sqlite;
+    Database database;
     ArrayList<ItemList> arrayList;
 
     public String selectedImagePath;
@@ -57,8 +60,11 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert);
 
+        //database=new Database();
+
         initComponents();
         initListeners();
+        initOperations();
     }
 
     @Override
@@ -101,13 +107,21 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
         buttonDate.setOnClickListener(this);
     }
 
+    public void initOperations()
+    {
+        //sqlite=openOrCreateDatabase("CineMania", Context.MODE_PRIVATE, null);
+    }
+
     public void insert(View v)
     {
         if(checkDatas())
         {
-            this.arrayList=FullList.getArrayList();
-            arrayList.add(new ItemList(selectedImagePath, editTextTitulo.getText().toString(), editTextSubTitulo.getText().toString(), textViewDate.getText().toString(), editTextDescripcion.getText().toString()));
-            FullList.setArrayList(arrayList);
+            //---INSERT DATA IN ARRAYLIST OF ItemList OBJECT
+            //this.arrayList=FullList.getArrayList();
+            //arrayList.add(new ItemList(selectedImagePath, editTextTitulo.getText().toString(), editTextSubTitulo.getText().toString(), textViewDate.getText().toString(), editTextDescripcion.getText().toString()));
+            //FullList.setArrayList(arrayList);
+
+            database.getDatabase().execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ('" + selectedImagePath + "','" + editTextTitulo.getText().toString() + "','" + editTextSubTitulo.getText().toString() + "','" + textViewDate.getText().toString() + "','" + editTextDescripcion.getText().toString() + "');");
 
             setResult(RESULT_OK);
             finish();

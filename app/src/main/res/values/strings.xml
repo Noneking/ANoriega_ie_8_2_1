@@ -32,4 +32,12 @@
     <string name="editTextModifyDateTag">Fecha</string>
     <string name="editTextModifyDescripcionTag">Descripción</string>
 
+    <string name="textViewViewTitle"></string>
+    <string name="textViewViewSubTitle"></string>
+    <string name="textViewViewDate"></string>
+    <string name="buttonViewDate">Fecha</string>
+    <string name="buttonView">INSERT</string>
+    <string name="textViewViewSubTitleTag"></string>
+    <string name="textViewViewDescripcionTag"></string>
+
 </resources>

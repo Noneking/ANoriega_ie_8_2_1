@@ -23,7 +23,7 @@ import android.widget.Toast;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MainActivity extends Activity implements MenuItem.OnMenuItemClickListener {
+public class MainActivity extends Activity implements MenuItem.OnMenuItemClickListener, ListView.OnItemClickListener {
 
     ListView listView;
     MenuItem insert_menuItem;
@@ -33,9 +33,12 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     ArrayAdapter<String> listViewAdapter;
     SQLiteDatabase sqlite;
 
+    Database database;
     FullList fullList;
 
     Intent intent;
+
+    int finished=0;
 
     public static final int VALUE = 0;
 
@@ -43,6 +46,8 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        database=new Database();
 
         initComponents();
         initListeners();
@@ -74,7 +79,6 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
         //    return true;
         //}
 
-        int finished=0;
         intent=new Intent();
 
         switch (item.getItemId())
@@ -98,19 +102,33 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     public void openDatabase()
     {
         sqlite=openOrCreateDatabase("CineMania", Context.MODE_PRIVATE, null);
-        sqlite.execSQL("DROP TABLE PELICULA");
+        //sqlite.execSQL("DROP TABLE PELICULA");
         sqlite.execSQL("CREATE TABLE IF NOT EXISTS PELICULA(" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
                 "IMG VARCHAR(100)," +
-                "TITULO VARCHAR(30)," +
+                "TITULO VARCHAR(30) UNIQUE," +
                 "SUBTITULO VARCHAR(30)," +
                 "FECHA VARCHAR(9)," +
                 "DESCRIPCION VARCHAR(100)" +
                 ");");
+        database.setDatabase(sqlite);
     }
 
     public void loadDatas()
     {
+        Cursor cursor=database.getDatabase().rawQuery("SELECT * FROM PELICULA;", null);
+        ArrayList<ItemList> arrayList=new ArrayList<ItemList>();
+        while(cursor.moveToNext())
+        {
+            String img=cursor.getString(cursor.getColumnIndex("IMG"));
+            String titulo=cursor.getString(cursor.getColumnIndex("TITULO"));
+            String subtitulo=cursor.getString(cursor.getColumnIndex("SUBTITULO"));
+            String fecha=cursor.getString(cursor.getColumnIndex("FECHA"));
+            String descripcion=cursor.getString(cursor.getColumnIndex("DESCRIPCION"));
+            ItemList item=new ItemList(img, titulo, subtitulo, fecha, descripcion);
+            arrayList.add(item);
+        }
+        fullList.setArrayList(arrayList);
         listView.setAdapter(new MyAdapter(this, R.layout.activity_item_list, fullList.getArrayList()) {
             @Override
             public void onEntrada(Object entrada, View view) {
@@ -136,6 +154,7 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
             }
         });
 
+        /**
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -143,8 +162,9 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
                 CharSequence texto = "Seleccionado: " + item.getTitulo();
                 Toast toast = Toast.makeText(MainActivity.this, texto, Toast.LENGTH_SHORT);
                 toast.show();
+
             }
-        });
+        });*/
 
         //ArrayList<ItemList> peliculas=new ArrayList<ItemList>();
         //Cursor cursor=sqlite.rawQuery("SELECT * FROM PELICULA", null);
@@ -167,7 +187,7 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
         System.out.println(subtitulo);
         System.out.println(fecha);
         System.out.println(descripcion);
-        sqlite.execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ("+img+","+titulo+","+subtitulo+","+fecha+","+descripcion+");");
+        database.getDatabase().execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES (" + img + "," + titulo + "," + subtitulo + "," + fecha + "," + descripcion + ");");
         loadDatas();
     }
 
@@ -179,11 +199,60 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
 
     public void initListeners()
     {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ItemList itemSelected= (ItemList) parent.getItemAtPosition(position);
+                itemSelected.getTitulo();
 
+                Cursor cursor=database.getDatabase().rawQuery("SELECT * FROM PELICULA WHERE TITULO='" + itemSelected.getTitulo() + "';", null);
+                cursor.moveToFirst();
+
+                itemClick(cursor);
+            }
+        });
+    }
+
+    public void itemClick(Cursor cursor)
+    {
+        String img=cursor.getString(cursor.getColumnIndex("IMG"));
+        String titulo=cursor.getString(cursor.getColumnIndex("TITULO"));
+        String subtitulo=cursor.getString(cursor.getColumnIndex("SUBTITULO"));
+        String fecha=cursor.getString(cursor.getColumnIndex("FECHA"));
+        String descripcion=cursor.getString(cursor.getColumnIndex("DESCRIPCION"));
+
+        Intent i = new Intent(this, ViewActivity.class);
+        i.putExtra("IMG", img);
+        i.putExtra("TITULO", titulo);
+        i.putExtra("SUBTITULO", subtitulo);
+        i.putExtra("FECHA", fecha);
+        i.putExtra("DESCRIPCION", descripcion);
+        startActivityForResult(i, finished);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        System.out.println("ESTAS PINCHANDO");
+        ItemList itemSelected= (ItemList) item;
+        itemSelected.getTitulo();
+
+        Cursor cursor=database.getDatabase().rawQuery("SELECT * FROM PELICULA WHERE TITULO='" + itemSelected.getTitulo() + "';", null);
+        cursor.moveToFirst();
+
+        String img=cursor.getString(cursor.getColumnIndex("IMG"));
+        String titulo=cursor.getString(cursor.getColumnIndex("TITULO"));
+        String subtitulo=cursor.getString(cursor.getColumnIndex("SUBTITULO"));
+        String fecha=cursor.getString(cursor.getColumnIndex("FECHA"));
+        String descripcion=cursor.getString(cursor.getColumnIndex("DESCRIPCION"));
+
+        intent = new Intent(this, ViewActivity.class);
+        intent.putExtra("IMG", img);
+        intent.putExtra("TITULO", titulo);
+        intent.putExtra("SUBTITULO", subtitulo);
+        intent.putExtra("FECHA", fecha);
+        intent.putExtra("DESCRIPCION", descripcion);
+        startActivityForResult(intent, finished);
+
 
         return false;
     }
@@ -199,4 +268,8 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
         }
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+    }
 }
