@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,10 +21,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MainActivity extends Activity implements MenuItem.OnMenuItemClickListener, ListView.OnItemClickListener {
+public class MainActivity extends Activity implements MenuItem.OnMenuItemClickListener, ListView.OnItemClickListener, ListView.OnItemLongClickListener {
 
     ListView listView;
     MenuItem insert_menuItem;
@@ -137,8 +142,19 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
                     ImageView img= (ImageView) view.findViewById(R.id.imageViewItem);
                     if(img!=null)
                     {
-                        Bitmap myBitmap = BitmapFactory.decodeFile(((ItemList) entrada).getPathImagen());
-                        img.setImageBitmap(myBitmap);
+                        try {
+
+                            //FileInputStream fis=new FileInputStream("/data/data/com.example.mantenimiento.anoriega_ie_8_2_1/files/"+img);
+                            FileInputStream fis=new FileInputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+"imageFolder"+ File.separator+img);
+                            img.setImageBitmap(BitmapFactory.decodeStream(fis));
+                            //String photoPath = Environment.getExternalStorageDirectory()+"/data/data/com.example.mantenimiento.anoriega_ie_8_2_1/files/"+img;
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                        //Bitmap myBitmap = BitmapFactory.decodeFile(((ItemList) entrada).getPathImagen());
+                        //img.setImageBitmap(myBitmap);
+
                     }
                     TextView titulo= (TextView) view.findViewById(R.id.item_textViewTitle);
                     if(titulo!=null)
@@ -202,13 +218,29 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ItemList itemSelected= (ItemList) parent.getItemAtPosition(position);
+                ItemList itemSelected = (ItemList) parent.getItemAtPosition(position);
                 itemSelected.getTitulo();
 
-                Cursor cursor=database.getDatabase().rawQuery("SELECT * FROM PELICULA WHERE TITULO='" + itemSelected.getTitulo() + "';", null);
+                Cursor cursor = database.getDatabase().rawQuery("SELECT * FROM PELICULA WHERE TITULO='" + itemSelected.getTitulo() + "';", null);
                 cursor.moveToFirst();
 
                 itemClick(cursor);
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("Entra en el item long click listener");
+
+                ItemList itemSelected= (ItemList) parent.getItemAtPosition(position);
+                itemSelected.getTitulo();
+
+                database.getDatabase().execSQL("DELETE FROM PELICULA WHERE TITULO='" + itemSelected.getTitulo() + "';");
+                Toast toast = Toast.makeText(MainActivity.this, "DELETE CORRECTLY", Toast.LENGTH_SHORT);
+                toast.show();
+                loadDatas();
+                return false;
             }
         });
     }
@@ -271,5 +303,11 @@ public class MainActivity extends Activity implements MenuItem.OnMenuItemClickLi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        return false;
     }
 }

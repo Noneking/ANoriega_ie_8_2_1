@@ -10,10 +10,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +31,12 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,6 +50,8 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
 
     public String selectedImagePath;
     Bitmap imageBitMap;
+    Uri imageURI;
+    String bitmapId;
 
     ImageButton imageButton;
     EditText editTextTitulo;
@@ -112,6 +122,12 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
         //sqlite=openOrCreateDatabase("CineMania", Context.MODE_PRIVATE, null);
     }
 
+    public byte[] getBytesFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
+    }
+
     public void insert(View v)
     {
         if(checkDatas())
@@ -121,7 +137,59 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
             //arrayList.add(new ItemList(selectedImagePath, editTextTitulo.getText().toString(), editTextSubTitulo.getText().toString(), textViewDate.getText().toString(), editTextDescripcion.getText().toString()));
             //FullList.setArrayList(arrayList);
 
-            database.getDatabase().execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ('" + selectedImagePath + "','" + editTextTitulo.getText().toString() + "','" + editTextSubTitulo.getText().toString() + "','" + textViewDate.getText().toString() + "','" + editTextDescripcion.getText().toString() + "');");
+            OutputStream out=null;
+            String root = Environment.getExternalStorageDirectory().getAbsolutePath()+"/";
+            File createDir = new File(root + "imgFolder" + File.separator);
+            if(!createDir.exists()) {
+                createDir.mkdir();
+            }
+            //File file = new File(root + "imgFolder" + File.separator +"Name of File");
+            File file = new File(root + "imgFolder" + File.separator +"UNO");
+
+
+
+            try {
+                file.createNewFile();
+                out = new FileOutputStream(file);
+                out.write(getBytesFromBitmap(imageBitMap));
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            bitmapId=Integer.toString(imageBitMap.getGenerationId());
+
+            imageURI.getPath();
+
+            System.out.println(this.getFilesDir().getAbsolutePath());
+            Toast toast = Toast.makeText(InsertActivity.this, this.getFilesDir().getAbsolutePath(), Toast.LENGTH_LONG);
+
+            FileOutputStream fos=null;
+            try {
+                //fos=new FileOutputStream(this.getFilesDir().getAbsolutePath()+"/"+bitmapId);
+                fos=new FileOutputStream(file);
+                imageBitMap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            finally
+            {
+                try {
+                    if (fos != null) {
+                        fos.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+            //database.getDatabase().execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ('" + bitmapId + "','" + editTextTitulo.getText().toString() + "','" + editTextSubTitulo.getText().toString() + "','" + textViewDate.getText().toString() + "','" + editTextDescripcion.getText().toString() + "');");
+            database.getDatabase().execSQL("INSERT INTO PELICULA (IMG, TITULO, SUBTITULO, FECHA, DESCRIPCION) VALUES ('UNO','" + editTextTitulo.getText().toString() + "','" + editTextSubTitulo.getText().toString() + "','" + textViewDate.getText().toString() + "','" + editTextDescripcion.getText().toString() + "');");
 
             setResult(RESULT_OK);
             finish();
@@ -176,10 +244,37 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
         switch (v.getId())
         {
             case R.id.imageButtonInsert:
+
+                /**
                     Intent intent = new Intent();
                     intent.setType("image/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
                     startActivityForResult(Intent.createChooser(intent, "RESULT_OK"), SELECT_PICTURE);
+                */
+
+
+                Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+
+                Intent pickIntent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
+
+                Intent chooserIntent=Intent.createChooser(intent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+
+                startActivityForResult(chooserIntent, 1);
+
+                /**
+                Uri uri=pickIntent.getData();
+                //Uri uri=chooserIntent.getData();
+                try {
+                    InputStream is=getContentResolver().openInputStream(uri);
+                    imageBitMap= BitmapFactory.decodeStream(is);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                 */
+
                 break;
             case R.id.insert_buttonDate:
                     Date_Picker date=new Date_Picker();
@@ -189,16 +284,31 @@ public class InsertActivity extends Activity implements ImageButton.OnClickListe
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
-                Uri selectedImageUri = data.getData();
+                /**Uri selectedImageUri = data.getData();
                 //selectedImagePath = getPath(selectedImageUri);
                 //System.out.println("Path del uri: "+selectedImageUri.getPath());
                 selectedImagePath = selectedImageUri.getPath();
                 imageButton.setImageURI(selectedImageUri);
 
                 //Drawable drawable = imageButton.getBackground();
-                //imageBitMap = ((BitmapDrawable)drawable).getBitmap();
+                //imageBitMap = ((BitmapDrawable)drawable).getBitmap();*/
+
+                Uri uri = data.getData();
+                selectedImagePath = uri.getPath();
+                imageButton.setImageURI(uri);
+                this.imageURI=uri;
+                //Uri uri=chooserIntent.getData();
+                try {
+                    InputStream is=getContentResolver().openInputStream(uri);
+                    System.out.println("HA ESTABLECIDO EL BITMAP");
+                    imageBitMap= BitmapFactory.decodeStream(is);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
     }
